@@ -24,6 +24,5 @@ int main(void)
     stack_elem_t x_3 = my_stack_pop(&stk);
     my_stack_dump(&stk);
     printf("%lg %lg %lg", x_1, x_2, x_3);
-
     my_stack_dtor(&stk);
 }

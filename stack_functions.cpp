@@ -15,8 +15,6 @@ int my_stack_push(my_stack* stk, stack_elem_t value)
     assert(value != NAN);
     
     stk->data[stk->size++] = value;
-    
-    printf("value = %lg", stk->data[stk->size]);
 }
 
 stack_elem_t my_stack_pop(my_stack* stk)
@@ -34,20 +32,25 @@ int my_stack_dtor(my_stack* stk)
 void my_stack_dump(my_stack* stk)
 {
     assert(stk != NULL);
-    static int n_calls = 1;
+    static int n_calls = 0;
 
     printf("-------------------------\n");
-    printf("It's your %d call\n", n_calls++);
+    printf("It's your %d call\n", ++n_calls);
     printf("-------------------------\n");
-    printf("Adress in which \"stk\"  is saved in %p\n", stk);
-    printf("Adress in which \"data\" is saved in %p\n", stk->data);
+    printf("Adress in which \"stk\"  is saved is %p\n", stk);
+    printf("Adress in which \"data\" is saved is %p\n", stk->data);
     printf("capasity = %2d\nsize     = %2d\n", stk->capacity, stk->size);
 }
 
-RESULT_OF_OPERATION ckeck_if_ok(void* invar)
+RESULT_OF_OPERATION ckeck_if_ok(my_stack* stk)
 {
-    if ((char*)invar != NULL)
+    if (stk->data == NULL)
         return FAILURE;
     else
         return SUCCESS;
+}
+
+void stack_assert(my_stack* stk)
+{
+    
 }
