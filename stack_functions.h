@@ -21,9 +21,9 @@ enum RESULT_OF_OPERATION
     FAILURE = 1,
 };
 
-int my_stack_ctor(my_stack* stk, int size);
-int my_stack_dtor(my_stack* stk);
-int my_stack_push(my_stack* stk, stack_elem_t value);
+void my_stack_ctor(my_stack* stk, int size);
+void my_stack_dtor(my_stack* stk);
+void my_stack_push(my_stack* stk, stack_elem_t value);
 stack_elem_t my_stack_pop(my_stack* stk);
 void my_stack_dump(my_stack* stk);
 RESULT_OF_OPERATION check_if_ok(my_stack* stk);
