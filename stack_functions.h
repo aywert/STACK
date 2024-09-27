@@ -13,24 +13,22 @@ struct my_stack
     stack_elem_t* data;
     int capacity;
     int size;
+    
 };
 
-enum SWITCH_IF_OK
+enum switch_if_ok
 {
-    DATA_NULL = -1,
+    DATA_NULL         = -1,
     CAPACITY_NAN      =  0,
     SIZE_NAN          =  1,
     SUCCESS           =  2,
     FAILURE           =  3,
 };
 
-int my_stack_ctor(my_stack* stk, int size);
-int my_stack_dtor(my_stack* stk);    
-int my_stack_push(my_stack* stk, stack_elem_t value);
-int my_stack_pop(my_stack* stk, stack_elem_t* x);
-void my_stack_dump(my_stack* stk);
-SWITCH_IF_OK check_if_ok(my_stack* stk);
-SWITCH_IF_OK stack_assert(my_stack* stk, const char* file, int line);
-int get_memory(my_stack* stk);
+switch_if_ok my_stack_ctor(my_stack* stk, int size);
+switch_if_ok my_stack_dtor(my_stack* stk);    
+switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value);
+switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x);
+void my_stack_dump(my_stack* stk, const char* name, const char* file, int line);
 
 #endif
