@@ -1,6 +1,6 @@
 #include"ASSERT.h"
 
-RESULT_OF_OPERATION check_if_ok(my_stack* stk)
+SWITCH_IF_OK check_if_ok(my_stack* stk)
 {
     if (stk->data == NULL || stk->capacity == NAN || stk->size == NAN)
         return FAILURE;
@@ -8,13 +8,16 @@ RESULT_OF_OPERATION check_if_ok(my_stack* stk)
         return SUCCESS;
 }
 
-void stack_assert(my_stack* stk, const char* file, int line)
+SWITCH_IF_OK stack_assert(my_stack* stk, const char* file, int line)
 {
     if (check_if_ok(stk) == FAILURE)
     {
         printf(RED("ERROR in line %d, in file %s\n"), line, file);
         my_stack_dump(stk);
+        return FAILURE;
     }
+    else
+        return SUCCESS;
 }
 
 void my_stack_dump(my_stack* stk)

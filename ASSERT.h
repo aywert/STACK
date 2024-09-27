@@ -7,4 +7,4 @@
 #define MAGENTA(M) "\x1b[35m" M "\x1b[0m"
 #define CYAN(C)    "\x1b[36m" C "\x1b[0m"
 
-#define ASSERT(X) stack_assert(X, __FILE__, __LINE__);
+#define ASSERT(X) if(stack_assert(X, __FILE__, __LINE__) == FAILURE) return 0;
