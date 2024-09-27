@@ -30,4 +30,12 @@ void my_stack_dump(my_stack* stk)
     printf("Adress in which \"stk\"  is saved is %p\n", stk);
     printf("Adress in which \"data\" is saved is %p\n", stk->data);
     printf("capasity = %2d\nsize     = %2d\n", stk->capacity, stk->size);
+    
+    if (stk->data != NULL)
+    {
+        for (int i = 0; i < stk->size; i++)
+        {
+            printf("x_%d == %lg\n", i, stk->data[i]);
+        }
+    }
 }

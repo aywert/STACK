@@ -25,11 +25,12 @@ enum SWITCH_IF_OK
 };
 
 int my_stack_ctor(my_stack* stk, int size);
-int my_stack_dtor(my_stack* stk);
+int my_stack_dtor(my_stack* stk);    
 int my_stack_push(my_stack* stk, stack_elem_t value);
-stack_elem_t my_stack_pop(my_stack* stk);
+int my_stack_pop(my_stack* stk, stack_elem_t* x);
 void my_stack_dump(my_stack* stk);
 SWITCH_IF_OK check_if_ok(my_stack* stk);
 SWITCH_IF_OK stack_assert(my_stack* stk, const char* file, int line);
+int get_memory(my_stack* stk);
 
 #endif
