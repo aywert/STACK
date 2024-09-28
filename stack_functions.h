@@ -19,7 +19,7 @@ struct my_stack
 
 enum switch_if_ok
 {
-    MY_UNDERFLOW       =  100000,
+    MY_UNDERFLOW    =  100000,
     GET_MEMORY_FAIL =   10000,
     SIZE_NAN        =    1000,
     CAPACITY_NAN    =     100,

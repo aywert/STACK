@@ -21,7 +21,7 @@ void my_stack_dump(my_stack* stk, const char* name, const char* file, int line)
 {
     static int n_calls = 0;
     int index = 1;
-
+    
     printf(RED("ERROR in line %d, in file %s, in function %s\n"), line, file, name);
     
     printf("----------Found issues so far in \"stk\"----------\n");
@@ -29,16 +29,16 @@ void my_stack_dump(my_stack* stk, const char* name, const char* file, int line)
     if (stk->status >= MY_UNDERFLOW)
         printf(YELLOW("%d) Underflow, please try again. There're no elements in the stack satisfying your need\n"), index++);
 
-    if ((int)(stk->status%10000) >= GET_MEMORY_FAIL)
+    if ((int)(stk->status%100000) >= GET_MEMORY_FAIL)
         printf(YELLOW("%d) Get memory couldn't find a spot\n"), index++);
 
-    if ((int)(stk->status%1000) == SIZE_NAN)
+    if ((int)(stk->status%10000) >= SIZE_NAN)
         printf(YELLOW("%d) Size of stack is NAN or less then 0\n"), index++);
 
-    if ((int)(stk->status%100) == CAPACITY_NAN)
+    if ((int)(stk->status%1000) == CAPACITY_NAN)
         printf(YELLOW("%d) Capacity of stack is invalid\n"), index++);
 
-    if ((int)(stk->status%10) >= DATA_NULL)
+    if ((int)(stk->status%100) >= DATA_NULL)
         printf(YELLOW("%d) Data turned out to be NULL\n"), index++);
     
     if (stk->status == ALL_OK)

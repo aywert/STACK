@@ -22,5 +22,7 @@ int main(void)
         MY_STACK_POP(&stk, &x); 
         printf("%lg\n", x);
     }
+    stack_elem_t w = 0;
+    MY_STACK_POP(&stk, &w);
     MY_STACK_DTOR(&stk);
 }

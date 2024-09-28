@@ -1,7 +1,7 @@
 #include"stack_functions.h"
 #include"ASSERT.h"
 
-static switch_if_ok get_memory(my_stack* stk);
+static switch_if_ok get_memory(my_stack* stk, double e);
 
 switch_if_ok my_stack_ctor(my_stack* stk, int size)
 {
@@ -27,7 +27,7 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value)
         {
             if (stk->size == stk->capacity)
             {
-                if (get_memory(stk) == SUCCESS)
+                if (get_memory(stk, 2) == SUCCESS)
                 {
                     stk->data[stk->size++] = value;
                     return SUCCESS;
@@ -50,6 +50,22 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value)
 
 switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x)
 {
+    /*if (stack_assert(stk) == SUCCESS)
+    {
+        if (stk->size == 0)
+            {
+                stk->status += MY_UNDERFLOW;
+                return FAILURE;
+            }
+        else
+        {
+            
+            *x = stk->data[--(stk->size)];
+            return SUCCESS;
+        }
+    }
+    else
+        return FAILURE;*/
     if (stack_assert(stk) == SUCCESS)
     {
         if (stk->size == 0)
@@ -59,28 +75,49 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x)
             }
         else
         {
-            *x = stk->data[--(stk->size)];
-            return SUCCESS;
+            if (stk->size <= stk->capacity/4 && stk->capacity >10)
+            {
+                if (get_memory(stk, 0.5) == SUCCESS)
+                {
+                    *x = stk->data[--(stk->size)];
+                    return SUCCESS;
+                }
+                else
+                {
+                    stk->status += GET_MEMORY_FAIL;
+                    return FAILURE;
+                }
+            }
+            else
+            { 
+                *x = stk->data[--(stk->size)];
+                return SUCCESS;
+            }
+            
         }
     }
     else
         return FAILURE;
+    
 }
 
 switch_if_ok my_stack_dtor(my_stack* stk)
 {
     if (stack_assert(stk) == SUCCESS)
     {
-        free(stk); stk = NULL;
+        stk->capacity = 0;
+        stk->size     = 0;
+        free(stk->data); stk->data = NULL;
+        
         return SUCCESS;
     }
     else
         return FAILURE;
 }
 
-switch_if_ok get_memory(my_stack* stk)
+switch_if_ok get_memory(my_stack* stk, double e)
 {
-    stk->capacity = stk->capacity * 2;
+    stk->capacity = (int)(stk->capacity * e);
     stack_elem_t* tempor_address = stk->data;
     stk->data = (stack_elem_t*)realloc(tempor_address, (stk->capacity) * sizeof(stack_elem_t));
   
