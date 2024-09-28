@@ -19,12 +19,14 @@ struct my_stack
 
 enum switch_if_ok
 {
-    CAPACITY_NAN = -2,
-    DATA_NULL    = -1,
-    ALL_OK       =  0,
-    SIZE_NAN     =  1,
-    SUCCESS      =  2,
-    FAILURE      =  3,
+    MY_UNDERFLOW       =  100000,
+    GET_MEMORY_FAIL =   10000,
+    SIZE_NAN        =    1000,
+    CAPACITY_NAN    =     100,
+    DATA_NULL       =      10,
+    ALL_OK          =       0,
+    SUCCESS         =       1,
+    FAILURE         =      -1,
 };
 
 switch_if_ok my_stack_ctor(my_stack* stk, int size);

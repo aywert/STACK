@@ -7,17 +7,16 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size)
 {
     assert(size != NAN);
     stk->data = (stack_elem_t*)calloc(size, sizeof(stack_elem_t));
-    assert(stk->data != NULL);
-
-    stk->capacity = size;
-    stk->size = 0;
     
     if (stack_assert(stk) == SUCCESS)
     {
+        stk->capacity = size;
+        stk->size = 0;
         return SUCCESS;
     }
     else
     {
+        stk->status += DATA_NULL;
         return FAILURE;
     }
 }
@@ -33,8 +32,11 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value)
                     stk->data[stk->size++] = value;
                     return SUCCESS;
                 }
-                else 
+                else
+                {
+                    stk->status += GET_MEMORY_FAIL;
                     return FAILURE;
+                }
             }
             else
             { 
@@ -52,7 +54,7 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x)
     {
         if (stk->size == 0)
             {
-                printf(YELLOW("Underflow, please try again. There're no elements in the stack satisfying your need\n"));
+                stk->status += MY_UNDERFLOW;
                 return FAILURE;
             }
         else

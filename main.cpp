@@ -22,11 +22,5 @@ int main(void)
         MY_STACK_POP(&stk, &x); 
         printf("%lg\n", x);
     }
-    stack_elem_t z = 0;
-    MY_STACK_POP(&stk, &z);
-        
-    printf("%lg\n", z);
-    printf("%lg\n", z);
-
-    my_stack_dtor(&stk);
+    MY_STACK_DTOR(&stk);
 }

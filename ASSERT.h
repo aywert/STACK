@@ -13,9 +13,15 @@ switch_if_ok stack_assert(my_stack* stk);
 #define MY_STACK_CTOR(X, Y) {                                                                   \
                             if(Y == NAN)                                                        \
                             {                                                                   \
-                                printf("Please enter correct value\n");                         \
+                                printf("Please enter correct value\nYou typed in NAN\n");                         \
+                                return 0;                                                       \
+                            }                                                               \
+                            if(X == NULL)                                                        \
+                            {                                                                   \
+                                printf("line = %d, file = %s\nPlease enter correct value\nYou typed in NULL\n", __LINE__, __FILE__);\
                                 return 0;                                                       \
                             }                                                                   \
+                                                                                                \
                             if( my_stack_ctor(X, Y) != SUCCESS)                                 \
                             {                                                                   \
                                 my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);      \
@@ -32,19 +38,14 @@ switch_if_ok stack_assert(my_stack* stk);
                             }                              
 
 #define MY_STACK_POP(X, Y) {                                                                    \
-                                if(Y == NULL)                                                   \
+                                if(Y == NULL || X == NULL)                                      \
                                 {                                                               \
-                                    printf("Please thin about pointer you gave me\n");          \
-                                    return 0;                                                   \
-                                }                                                               \
-                                if ((X)->size < 0)                                              \
-                                {                                                               \
-                                    printf("We're not working on how to fix this\n");           \ 
+                                    printf("line: %d, file: %s\nPlease think about pointer you gave me\nIt's NULL", __LINE__, __FILE__); \
                                     return 0;                                                   \
                                 }                                                               \
                                 if (my_stack_pop(X, Y) != SUCCESS)                              \
                                 {                                                               \
-                                    my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);                                                     \
+                                    my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);  \
                                     return 0;                                                   \
                                 }                                                               \
                             }                                                     
@@ -55,6 +56,11 @@ switch_if_ok stack_assert(my_stack* stk);
                                     printf("Y is a poison_number");                             \
                                     return 0;                                                   \
                                 }                                                               \
+                            if(X == NULL)                                                        \
+                            {                                                                   \
+                                printf("line = %d, file = %s\nPlease enter correct value\nYou typed in NULL\n", __LINE__, __FILE__);\
+                                return 0;                                                       \
+                            }                                                                \
                             if(my_stack_push(X, Y) != SUCCESS)                                  \
                                 {                                                               \
                                     printf("i was here\n");                                     \
