@@ -11,7 +11,7 @@ switch_if_ok stack_assert(my_stack* stk);
 
 #define ASSERT(X) {if(stack_assert(X) == FAILURE) return 0;}
 #define MY_STACK_CTOR(X, Y) {                                                                   \
-                            if(Y == poison_number)                                              \
+                            if(Y == NAN)                                                        \
                             {                                                                   \
                                 printf("Please enter correct value\n");                         \
                                 return 0;                                                       \

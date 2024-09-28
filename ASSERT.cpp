@@ -11,7 +11,7 @@ switch_if_ok stack_assert(my_stack* stk)
     if (stk->size == NAN or stk->size < 0)
         stk->status = SIZE_NAN;
         
-    if (stk->data == NULL || stk->capacity == NAN || stk->size == NAN || stk->status != ALL_OK)
+    if (stk->status != ALL_OK)
         return FAILURE;
     else
         return SUCCESS;
