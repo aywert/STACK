@@ -7,16 +7,19 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size)
 {
     assert(size != NAN);
     stk->data = (stack_elem_t*)calloc(size, sizeof(stack_elem_t));
-
     assert(stk->data != NULL);
 
     stk->capacity = size;
     stk->size = 0;
-    //ASSERT(stk);
+    
     if (stack_assert(stk) == SUCCESS)
+    {
         return SUCCESS;
+    }
     else
+    {
         return FAILURE;
+    }
 }
 
 switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value)

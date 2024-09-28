@@ -11,16 +11,15 @@ int main(void)
 
     MY_STACK_CTOR(&stk, capacity_of_stack);
 
-    for (int j = 0; j < 21; j++)
+    for (stack_elem_t j = 0; j < 21; j++)
     {
         MY_STACK_PUSH(&stk, j);
     }
 
-    for (int k = 0; k < 21; k++)
+    for (stack_elem_t k = 0; k < 21; k++)
     {
         stack_elem_t x = 0;
-        MY_STACK_POP(&stk, &x);
-        
+        MY_STACK_POP(&stk, &x); 
         printf("%lg\n", x);
     }
     stack_elem_t z = 0;

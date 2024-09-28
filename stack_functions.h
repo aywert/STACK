@@ -7,22 +7,24 @@
 #include<math.h>
 
 typedef double stack_elem_t;
+const double poison_number = -13;
 
 struct my_stack
 {
     stack_elem_t* data;
     int capacity;
     int size;
-    
+    int status;
 };
 
 enum switch_if_ok
 {
-    DATA_NULL         = -1,
-    CAPACITY_NAN      =  0,
-    SIZE_NAN          =  1,
-    SUCCESS           =  2,
-    FAILURE           =  3,
+    CAPACITY_NAN = -2,
+    DATA_NULL    = -1,
+    ALL_OK       =  0,
+    SIZE_NAN     =  1,
+    SUCCESS      =  2,
+    FAILURE      =  3,
 };
 
 switch_if_ok my_stack_ctor(my_stack* stk, int size);

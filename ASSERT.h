@@ -10,34 +10,55 @@
 switch_if_ok stack_assert(my_stack* stk);
 
 #define ASSERT(X) {if(stack_assert(X) == FAILURE) return 0;}
-#define MY_STACK_CTOR(X, Y) {                                                                       \
-                            if(Y == NAN || my_stack_ctor(X, Y) != SUCCESS)                          \
-                                {                                                                   \
-                                    my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);      \
-                                    return 0;                                                       \
-                                }                                                                   \
+#define MY_STACK_CTOR(X, Y) {                                                                   \
+                            if(Y == poison_number)                                              \
+                            {                                                                   \
+                                printf("Please enter correct value\n");                         \
+                                return 0;                                                       \
+                            }                                                                   \
+                            if( my_stack_ctor(X, Y) != SUCCESS)                                 \
+                            {                                                                   \
+                                my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);      \
+                                return 0;                                                       \
+                            }                                                                   \
                             }
 
-#define MY_STACK_DTOR(X)    {                                                                       \
-                            if(my_stack_dtor(X) != SUCCESS)                                         \
-                                {                                                                   \
-                                     my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);     \
-                                    return 0;                                                       \
-                                }                                                                   \
+#define MY_STACK_DTOR(X)    {                                                                   \
+                            if(my_stack_dtor(X) != SUCCESS)                                     \
+                                {                                                               \
+                                    my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);  \
+                                    return 0;                                                   \
+                                }                                                               \
                             }                              
 
-#define MY_STACK_POP(X, Y) {                                                                        \
-                            if(Y == NULL || (X)->size < 0 || my_stack_pop(X, Y) != SUCCESS)            \
-                                {                                                                   \
+#define MY_STACK_POP(X, Y) {                                                                    \
+                                if(Y == NULL)                                                   \
+                                {                                                               \
+                                    printf("Please thin about pointer you gave me\n");          \
+                                    return 0;                                                   \
+                                }                                                               \
+                                if ((X)->size < 0)                                              \
+                                {                                                               \
+                                    printf("We're not working on how to fix this\n");           \ 
+                                    return 0;                                                   \
+                                }                                                               \
+                                if (my_stack_pop(X, Y) != SUCCESS)                              \
+                                {                                                               \
                                     my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);                                                     \
-                                    return 0;                                                       \
-                                }                                                                   \
+                                    return 0;                                                   \
+                                }                                                               \
                             }                                                     
 
-#define MY_STACK_PUSH(X, Y) {                                                                       \
-                            if(  Y == NAN || my_stack_push(X, Y) != SUCCESS)                        \
-                                {                                                                   \
-                                     my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);     \
-                                    return 0;                                                       \
-                                }                                                                   \
+#define MY_STACK_PUSH(X, Y) {                                                                   \
+                            if((int)Y == poison_number)                                         \
+                                {                                                               \
+                                    printf("Y is a poison_number");                             \
+                                    return 0;                                                   \
+                                }                                                               \
+                            if(my_stack_push(X, Y) != SUCCESS)                                  \
+                                {                                                               \
+                                    printf("i was here\n");                                     \
+                                    my_stack_dump(X, __PRETTY_FUNCTION__, __FILE__, __LINE__);  \
+                                    return 0;                                                   \
+                                }                                                               \
                             }
