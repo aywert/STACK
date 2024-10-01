@@ -50,22 +50,6 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value)
 
 switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x)
 {
-    /*if (stack_assert(stk) == SUCCESS)
-    {
-        if (stk->size == 0)
-            {
-                stk->status += MY_UNDERFLOW;
-                return FAILURE;
-            }
-        else
-        {
-            
-            *x = stk->data[--(stk->size)];
-            return SUCCESS;
-        }
-    }
-    else
-        return FAILURE;*/
     if (stack_assert(stk) == SUCCESS)
     {
         if (stk->size == 0)
