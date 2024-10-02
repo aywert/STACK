@@ -2,111 +2,178 @@
 #include"ASSERT.h"
 
 static switch_if_ok get_memory(my_stack* stk, double e);
+const int add_info = 2;
 
-switch_if_ok my_stack_ctor(my_stack* stk, int size)
+switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name, int line, const char* file, const char* function)
 {
-    assert(size != NAN);
-    stk->data = (stack_elem_t*)calloc(size, sizeof(stack_elem_t));
-    
-    if (stack_assert(stk) == SUCCESS)
+    if (stk == NULL || !isnormal(size))
     {
-        stk->capacity = size;
-        stk->size = 0;
-        return SUCCESS;
+        printf(RED("ERROR Pointer to stack is NULL or size IS NAN\n"));
+        return FAILURE;
     }
-    else
+
+    stk->data = (stack_elem_t*)calloc(size + add_info, sizeof(stack_elem_t));
+    
+    if (stk->data == NULL)
     {
         stk->status += DATA_NULL;
+        my_stack_dump(stk, function, file, line);
         return FAILURE;
     }
-}
 
-switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value)
-{
-    if (stack_assert(stk) == SUCCESS)
-        {
-            if (stk->size == stk->capacity)
-            {
-                if (get_memory(stk, 2) == SUCCESS)
-                {
-                    stk->data[stk->size++] = value;
-                    return SUCCESS;
-                }
-                else
-                {
-                    stk->status += GET_MEMORY_FAIL;
-                    return FAILURE;
-                }
-            }
-            else
-            { 
-                stk->data[stk->size++] = value;
-                return SUCCESS;
-            }
-        }   
-    else
-        return FAILURE;
-}
-
-switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x)
-{
-    if (stack_assert(stk) == SUCCESS)
+    stk->data[0] = 0xDED;               //left_block
+    for (int i = 1; i <= size; i++)
     {
-        if (stk->size == 0)
-            {
-                stk->status += MY_UNDERFLOW;
-                return FAILURE;
-            }
+        stk->data[i] = poison_number;
+    }       
+    stk->data[size + 1] = 0xDED;        //right_block
+    stk->data = &stk->data[1];
+
+    stk->name = name;
+    stk->file = file;
+    stk->line = line;
+    stk->function = function;
+
+    stk->add_info = add_info;
+    stk->capacity = size;
+    stk->size = 0;
+    stk->status = ALL_OK;
+
+    return SUCCESS;
+}
+
+switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value, const char* function, const char* file, int line)
+{
+    if (stack_assert(stk) == FAILURE)
+    {
+        if (value != poison_number)
+            my_stack_dump(stk, function, file, line);
+        else
+            printf("value is poison_number\n");
+        return FAILURE;
+    }
+
+    if (stk->size == stk->capacity)
+    {
+        stk->data[stk->capacity] = (stack_elem_t)poison_number;
+        if (get_memory(stk, 2) == SUCCESS)
+        {
+            stk->data = &stk->data[1];
+            stk->data[stk->capacity] = 0xDED;
+            stk->data[stk->size++] = value;
+            return SUCCESS;
+        }
         else
         {
-            if (stk->size <= stk->capacity/4 && stk->capacity >10)
-            {
-                if (get_memory(stk, 0.5) == SUCCESS)
-                {
-                    *x = stk->data[--(stk->size)];
-                    return SUCCESS;
-                }
-                else
-                {
-                    stk->status += GET_MEMORY_FAIL;
-                    return FAILURE;
-                }
-            }
-            else
-            { 
-                *x = stk->data[--(stk->size)];
-                return SUCCESS;
-            }
-            
+            stk->status += GET_MEMORY_FAIL;
+            my_stack_dump(stk, function, file, line);
+            return FAILURE;
         }
     }
     else
-        return FAILURE;
+    { 
+        stk->data[stk->size++] = value;
+        return SUCCESS;
+    }
     
 }
 
-switch_if_ok my_stack_dtor(my_stack* stk)
+switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x, const char* function, const char* file, int line)
 {
-    if (stack_assert(stk) == SUCCESS)
+    if ((stack_assert(stk) == FAILURE))
+    {
+        my_stack_dump(stk, function, file, line);
+        return FAILURE;
+    }
+
+    if (x == NULL)
+    {
+        printf(RED("given adress is NULL\n"));
+        return FAILURE;
+    }
+    
+    if (stk->size == 0)
+        {
+            stk->status += MY_UNDERFLOW;
+            my_stack_dump(stk, function, file, line);
+            return FAILURE;
+        }
+    else
+    {
+        if (stk->size <= (int)stk->capacity/4 && stk->capacity > 10)
+        {
+            stk->data[stk->capacity] = 0xDED;
+            if (get_memory(stk, 0.5) == SUCCESS)
+            {
+                stk->data = &stk->data[1];
+                stk->data[stk->capacity] = 0xDED;
+                *x = stk->data[--(stk->size)];
+                return SUCCESS;
+            }
+            else
+            {
+                stk->status += GET_MEMORY_FAIL;
+                my_stack_dump(stk, function, file, line);
+                return FAILURE;
+            }
+        }
+        else
+        { 
+            *x = stk->data[--(stk->size)];
+            return SUCCESS;
+        }
+    }
+    
+}
+
+switch_if_ok my_stack_dtor(my_stack* stk, int line, const char* file, const char* function)
+{
+    if (stack_assert(stk) == FAILURE)
+    {
+        my_stack_dump(stk, function, file, line);
+        return FAILURE;
+    }
+    else
     {
         stk->capacity = 0;
         stk->size     = 0;
         free(stk->data); stk->data = NULL;
         
+        printf(GREEN("SUCCESSFULLY CLEARED\n"));
+        return SUCCESS;
+    }
+}
+
+switch_if_ok get_memory(my_stack* stk, double e)
+{
+    stk->capacity = (int)(stk->capacity * e);
+    stack_elem_t* tempor_address = &stk->data[-1];
+    stk->data = (stack_elem_t*)realloc(tempor_address, (stk->capacity + stk->add_info) * sizeof(stack_elem_t));
+  
+    for (int i = (int)stk->capacity/e; i < stk->capacity; i++)
+        stk->data[i+1] = poison_number;
+    if (stk->data != NULL)
+    {
         return SUCCESS;
     }
     else
         return FAILURE;
 }
 
-switch_if_ok get_memory(my_stack* stk, double e)
+void user_dump(my_stack* stk)
 {
-    stk->capacity = (int)(stk->capacity * e);
-    stack_elem_t* tempor_address = stk->data;
-    stk->data = (stack_elem_t*)realloc(tempor_address, (stk->capacity) * sizeof(stack_elem_t));
-  
-    /*for (int i = 0;  stk->capacity - 1 < i < stk->capacity - 1; i++)
-        stk->data[i] = 0;*/
-
-    return stack_assert(stk);
-}
+    if (stk->data != NULL)
+    {
+        /*if (stk->size == 0)
+            printf(CYAN("Nothing to print. Stack is empty.\n"));
+        else*/
+        {
+            printf("----------------------\n");
+            for (int i = -1; i <= stk->capacity; i++)
+            {
+                printf("[x_%d] == %lg\n", i, stk->data[i]);
+            }
+            printf("----------------------\n");
+        }
+    }
+} 

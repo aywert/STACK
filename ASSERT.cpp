@@ -12,34 +12,54 @@ switch_if_ok stack_assert(my_stack* stk)
         stk->status += SIZE_NAN;
         
     if (stk->status != ALL_OK)
+        {
+        printf("i was hereee");
         return FAILURE;
+        }
     else
         return SUCCESS;
 }
 
-void my_stack_dump(my_stack* stk, const char* name, const char* file, int line)
+void my_stack_dump(my_stack* stk, const char* function, const char* file, int line)
 {
     static int n_calls = 0;
     int index = 1;
     
-    printf(RED("ERROR in line %d, in file %s, in function %s\n"), line, file, name);
+    printf(RED("ERROR in line %d, in file %s, in function %s\n"), line, file, function);
+    printf("%s was made in file %s in function %s on line %d\n", stk->name, stk->file, stk->function, stk->line);
     
-    printf("----------Found issues so far in \"stk\"----------\n");
-     
-    if (stk->status >= MY_UNDERFLOW)
+    printf("----------Found issues so far in %s ----------\n", stk->name);
+
+    int status = stk->status;
+    if (status >> 5)
+    {
         printf(YELLOW("%d) Underflow, please try again. There're no elements in the stack satisfying your need\n"), index++);
+        status -= MY_UNDERFLOW;
+    }
 
-    if ((int)(stk->status%100000) >= GET_MEMORY_FAIL)
+    if (status >> 4)
+    {
         printf(YELLOW("%d) Get memory couldn't find a spot\n"), index++);
+        status -= GET_MEMORY_FAIL;
+    }
 
-    if ((int)(stk->status%10000) >= SIZE_NAN)
+    if (status >> 3)
+    {
         printf(YELLOW("%d) Size of stack is NAN or less then 0\n"), index++);
+        status -= SIZE_NAN; 
+    }
 
-    if ((int)(stk->status%1000) == CAPACITY_NAN)
+    if (status >> 2)
+    {
         printf(YELLOW("%d) Capacity of stack is invalid\n"), index++);
+        status -= CAPACITY_NAN;
+    }
 
-    if ((int)(stk->status%100) >= DATA_NULL)
+    if (status >> 1)
+    {
         printf(YELLOW("%d) Data turned out to be NULL\n"), index++);
+        status -= DATA_NULL;
+    }
     
     if (stk->status == ALL_OK)
         printf(GREEN("* Nothing found\n"));
