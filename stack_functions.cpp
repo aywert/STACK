@@ -6,6 +6,7 @@ const int add_info = 2;
 
 switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, int line, const char* file, const char* function))
 {
+    //printf("%d", 0xDED);
     if (stk == NULL || !isnormal(size))
     {
         printf(RED("ERROR Pointer to stack is NULL or size IS NAN\n"));
@@ -20,7 +21,8 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, 
         my_stack_dump(stk ON_DEBUG(,function, file, line));
         return FAILURE;
     }
-
+    stk->left_block = 3565;
+    stk->right_block = 3565;
     stk->data[0] = 0xDED;               //left_block
     for (int i = 1; i <= size; i++)
     {
@@ -48,12 +50,11 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const ch
     if (stack_assert(stk) == FAILURE)
     {   
         my_stack_dump(stk ON_DEBUG(, function, file, line));
+        printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
         return FAILURE;
     }
-    if (value == poison_number || (!(isnormal(value))&&(value!=0)))
+    if (value == poison_number || (!(isnormal(value)) && (value != 0)))
     {
-        printf("%d\n", isnormal(value));
-        printf("%d\n", value);
         printf(RED("ERROR: Value is poison number or NAN\n"));
         my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
@@ -139,7 +140,7 @@ switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file,
         my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
     }
-    else
+    else // why?
     {
         stk->capacity = 0;
         stk->size     = 0;
@@ -150,6 +151,18 @@ switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file,
     }
 }
 
+/*
+void StackUp (stk)
+{
+
+}
+
+void StackDown (stk)
+{
+
+}*/
+
+// const + bool sign
 switch_if_ok get_memory(my_stack* stk, double e)
 {
     stk->capacity = (int)(stk->capacity * e);

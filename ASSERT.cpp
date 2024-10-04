@@ -1,5 +1,6 @@
 #include"stack_functions.h"
 
+
 switch_if_ok stack_assert(my_stack* stk)
 {
     if (stk->data == NULL)
@@ -10,11 +11,29 @@ switch_if_ok stack_assert(my_stack* stk)
 
     if (stk->size == NAN or stk->size < 0)
         stk->status += SIZE_NAN;
-        
+
+    if (stk->left_block != 3565)
+    {
+        stk->status += SK_KANARIKA_L;
+    }
+    if (stk->right_block != 3565)
+    {
+        stk->status += SK_KANARIKA_R;
+    }
+
+    if (stk->data[-1] != 3565)
+    {
+        stk->status += DATA_KANARIKA_L;
+    }
+
+    if (stk->data[stk->capacity] != 3565)
+    {
+        stk->status += DATA_KANARIKA_R;
+    }    
     if (stk->status != ALL_OK)
-        {
+    {
         return FAILURE;
-        }
+    }
     else
         return SUCCESS;
 }
@@ -22,21 +41,42 @@ switch_if_ok stack_assert(my_stack* stk)
 void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* file, int line))
 {
     static int n_calls = 0;
-    
-    
-    #ifdef DEBUG
     int index = 1;
+
+    #ifdef DEBUG
     printf(RED("ERROR in line %d, in file %s, in function %s\n"), line, file, function);
     printf("%s was made in file %s in function %s on line %d\n", stk->name, stk->file, stk->function, stk->line);
-   
+    #endif
     
     printf("----------Found issues so far in %s ----------\n", stk->name);
 
     int status = stk->status;
+
+    if (status >> 9)
+    {
+        printf(YELLOW("%d)SK_KANARIKA_L \n"), index++);
+        status -= SK_KANARIKA_L;
+    }
+    if (status >> 8)
+    {
+        printf(YELLOW("%d) SK_KANARIKA_R\n"), index++);
+        status -= SK_KANARIKA_R;
+    }
+    if (status >> 7)
+    {
+        printf(YELLOW("%d)  DATA_KANARIKA_L\n"), index++);
+        status -= DATA_KANARIKA_L;
+    }
+    if (status >> 6)
+    {
+        printf(YELLOW("%d)  DATA_KANARIKA_R\n"), index++);
+        status -= DATA_KANARIKA_R;
+    }
+
     if (status >> 5)
     {
-        printf(YELLOW("%d) Underflow, please try again. There're no elements in the stack satisfying your need\n"), index++);
-        status -= MY_UNDERFLOW;
+        printf(YELLOW("%d) UNDERFLOW\n"), index++);
+        status -= MY_UNDERFLOW ;
     }
 
     if (status >> 4)
@@ -65,7 +105,7 @@ void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* fi
     
     if (stk->status == ALL_OK)
         printf(GREEN("* Nothing found\n"));
-    #endif
+    
     printf("-------------------------\n");
     printf(MAGENTA("It's your %d call\n"), ++n_calls);
     printf("-------------------------\n");

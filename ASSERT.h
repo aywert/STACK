@@ -1,7 +1,6 @@
 #ifndef ASSERTION
 #define ASSERTION
 
-#include"stack_functions.h"
 //#define DEBUG
 
 #define RED(R)     "\x1b[31m" R "\x1b[0m"
@@ -31,14 +30,14 @@
     }                                                                               \
 
 #define MY_STACK_POP(X, Y)                                                                      \
-    if (my_stack_pop(X, Y ON_DEBUG(,__PRETTY_FUNCTION__, __FILE__, __LINE__)) != SUCCESS)        \
+    if (my_stack_pop(X, Y ON_DEBUG(,__PRETTY_FUNCTION__, __FILE__, __LINE__)) != SUCCESS)       \
     {                                                                                           \
         return 0;                                                                               \
     }                                                                                           \
                                                    
 
 #define MY_STACK_PUSH(X, Y)                                                                     \
-    if(my_stack_push(X, Y ON_DEBUG(,__PRETTY_FUNCTION__, __FILE__, __LINE__)) != SUCCESS)        \
+    if(my_stack_push(X, Y ON_DEBUG(,__PRETTY_FUNCTION__, __FILE__, __LINE__)) != SUCCESS)       \
     {                                                                                           \
         return 0;                                                                               \
     } 
