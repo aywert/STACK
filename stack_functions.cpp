@@ -4,7 +4,7 @@
 static switch_if_ok get_memory(my_stack* stk, double e);
 const int add_info = 2;
 
-switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name, int line, const char* file, const char* function)
+switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, int line, const char* file, const char* function))
 {
     if (stk == NULL || !isnormal(size))
     {
@@ -17,7 +17,7 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name, int line, 
     if (stk->data == NULL)
     {
         stk->status += DATA_NULL;
-        my_stack_dump(stk, function, file, line);
+        my_stack_dump(stk ON_DEBUG(,function, file, line));
         return FAILURE;
     }
 
@@ -28,11 +28,12 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name, int line, 
     }       
     stk->data[size + 1] = 0xDED;        //right_block
     stk->data = &stk->data[1];
-
     stk->name = name;
-    stk->file = file;
-    stk->line = line;
-    stk->function = function;
+    #ifdef DEBUG
+        stk->file = file;
+        stk->line = line;
+        stk->function = function;
+    #endif
 
     stk->add_info = add_info;
     stk->capacity = size;
@@ -42,14 +43,19 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name, int line, 
     return SUCCESS;
 }
 
-switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value, const char* function, const char* file, int line)
+switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const char* function, const char* file, int line))
 {
     if (stack_assert(stk) == FAILURE)
+    {   
+        my_stack_dump(stk ON_DEBUG(, function, file, line));
+        return FAILURE;
+    }
+    if (value == poison_number || (!(isnormal(value))&&(value!=0)))
     {
-        if (value != poison_number)
-            my_stack_dump(stk, function, file, line);
-        else
-            printf("value is poison_number\n");
+        printf("%d\n", isnormal(value));
+        printf("%d\n", value);
+        printf(RED("ERROR: Value is poison number or NAN\n"));
+        my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
     }
 
@@ -66,7 +72,7 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value, const char* functi
         else
         {
             stk->status += GET_MEMORY_FAIL;
-            my_stack_dump(stk, function, file, line);
+            my_stack_dump(stk ON_DEBUG(, function, file, line));
             return FAILURE;
         }
     }
@@ -78,11 +84,11 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value, const char* functi
     
 }
 
-switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x, const char* function, const char* file, int line)
+switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* function, const char* file, int line))
 {
     if ((stack_assert(stk) == FAILURE))
     {
-        my_stack_dump(stk, function, file, line);
+        my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
     }
 
@@ -95,7 +101,7 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x, const char* function, 
     if (stk->size == 0)
         {
             stk->status += MY_UNDERFLOW;
-            my_stack_dump(stk, function, file, line);
+            my_stack_dump(stk ON_DEBUG(, function, file, line));
             return FAILURE;
         }
     else
@@ -113,7 +119,7 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x, const char* function, 
             else
             {
                 stk->status += GET_MEMORY_FAIL;
-                my_stack_dump(stk, function, file, line);
+                my_stack_dump(stk ON_DEBUG(, function, file, line));
                 return FAILURE;
             }
         }
@@ -126,11 +132,11 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x, const char* function, 
     
 }
 
-switch_if_ok my_stack_dtor(my_stack* stk, int line, const char* file, const char* function)
+switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file, const char* function))
 {
     if (stack_assert(stk) == FAILURE)
     {
-        my_stack_dump(stk, function, file, line);
+        my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
     }
     else
@@ -164,9 +170,6 @@ void user_dump(my_stack* stk)
 {
     if (stk->data != NULL)
     {
-        /*if (stk->size == 0)
-            printf(CYAN("Nothing to print. Stack is empty.\n"));
-        else*/
         {
             printf("----------------------\n");
             for (int i = -1; i <= stk->capacity; i++)

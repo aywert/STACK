@@ -13,7 +13,7 @@ int main(void)
     for (stack_elem_t j = 0; j < 21; j++)
     {
         MY_STACK_PUSH(&stk, j);
-        user_dump(&stk);
+        //user_dump(&stk);
     }
 
     for (stack_elem_t k = 0; k < 21; k++)

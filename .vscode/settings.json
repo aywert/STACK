@@ -3,6 +3,7 @@
         "array": "cpp",
         "hash_map": "cpp",
         "bitset": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "functional": "cpp"
     }
 }

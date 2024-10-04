@@ -1,4 +1,4 @@
-#include"ASSERT.h"
+#include"stack_functions.h"
 
 switch_if_ok stack_assert(my_stack* stk)
 {
@@ -13,20 +13,22 @@ switch_if_ok stack_assert(my_stack* stk)
         
     if (stk->status != ALL_OK)
         {
-        printf("i was hereee");
         return FAILURE;
         }
     else
         return SUCCESS;
 }
 
-void my_stack_dump(my_stack* stk, const char* function, const char* file, int line)
+void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* file, int line))
 {
     static int n_calls = 0;
-    int index = 1;
     
+    
+    #ifdef DEBUG
+    int index = 1;
     printf(RED("ERROR in line %d, in file %s, in function %s\n"), line, file, function);
     printf("%s was made in file %s in function %s on line %d\n", stk->name, stk->file, stk->function, stk->line);
+   
     
     printf("----------Found issues so far in %s ----------\n", stk->name);
 
@@ -63,7 +65,7 @@ void my_stack_dump(my_stack* stk, const char* function, const char* file, int li
     
     if (stk->status == ALL_OK)
         printf(GREEN("* Nothing found\n"));
-
+    #endif
     printf("-------------------------\n");
     printf(MAGENTA("It's your %d call\n"), ++n_calls);
     printf("-------------------------\n");
