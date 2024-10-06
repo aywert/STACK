@@ -6,30 +6,37 @@ switch_if_ok stack_assert(my_stack* stk)
     if (stk->data == NULL)
         stk->status += DATA_NULL;
 
-    if (stk->capacity == NAN)
+    if (stk->capacity == NAN || stk->capacity < 0)
         stk->status += CAPACITY_NAN;
 
-    if (stk->size == NAN or stk->size < 0)
+    if (stk->size == NAN || stk->size < 0)
         stk->status += SIZE_NAN;
 
-    if (stk->left_block != 3565)
+    if (!compare_double(stk->left_block, 0xDED))
     {
         stk->status += SK_KANARIKA_L;
     }
-    if (stk->right_block != 3565)
+    if (!compare_double(stk->right_block, 0xDED))
     {
         stk->status += SK_KANARIKA_R;
     }
 
-    if (stk->data[-1] != 3565)
+    if (!compare_double(stk->data[-1], 0xDED))
     {
         stk->status += DATA_KANARIKA_L;
     }
 
-    if (stk->data[stk->capacity] != 3565)
+    if (!compare_double(stk->data[stk->capacity], 0xDED))
     {
         stk->status += DATA_KANARIKA_R;
-    }    
+    }
+
+    if (stk->data_hash != get_data_hash((char*)&stk->data[0], stk->size))
+    {
+        printf("!!!%llu versus %llu\n!!!", stk->data_hash, get_data_hash((char*)&stk->data[0], stk->size));
+        stk->status += WARP_VAL_DATA;
+    }
+    
     if (stk->status != ALL_OK)
     {
         return FAILURE;
@@ -51,7 +58,12 @@ void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* fi
     printf("----------Found issues so far in %s ----------\n", stk->name);
 
     int status = stk->status;
-
+    printf("%d\n", status);
+    if (status >> 10)
+    {
+        printf(YELLOW("%d)WARP_OF_DATA \n"), index++);
+        status -= WARP_VAL_DATA;
+    }
     if (status >> 9)
     {
         printf(YELLOW("%d)SK_KANARIKA_L \n"), index++);
@@ -126,3 +138,29 @@ void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* fi
         }
     }
 }
+
+int compare_double(double a, double b)
+{
+    if (fabs(a - b) <= 0.000001)
+        return 1;
+    else 
+        return 0;
+}
+
+uint64_t get_data_hash(char* data, int size)
+{
+    uint64_t h = 5381;
+    for (int i = 0; i < size*sizeof(stack_elem_t); i++)
+    {
+        h = (31 * (h)) ^ data[i];
+    }
+    return h;
+}
+
+/*int get_stk_hash(my_stack* stk, int size, uint64_t* h)
+{
+    for (int i = 0; i < size*sizeof(stack_elem_t); i++)
+    {
+        *h = (31 * (*h)) ^ data[i];
+    }
+}*/

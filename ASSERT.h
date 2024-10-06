@@ -1,7 +1,7 @@
 #ifndef ASSERTION
 #define ASSERTION
 
-//#define DEBUG
+#define DEBUG
 
 #define RED(R)     "\x1b[31m" R "\x1b[0m"
 #define GREEN(G)   "\x1b[32m" G "\x1b[0m"

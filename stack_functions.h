@@ -1,6 +1,7 @@
 #ifndef STACK_FUNCTIONS
 #define STACK_FUNCTIONS
 
+#include<stdint.h>
 #include"ASSERT.h"
 #include<stdio.h>
 #include<stdlib.h>
@@ -14,22 +15,26 @@ const double poison_number = -13;
 struct my_stack
 {
     int left_block;
-    stack_elem_t* data;
+    //////////////
     const char* name;
     const char* file;
     const char* function;
     int line;
-
+    /////////////
+    stack_elem_t* data;
     int capacity;
     int size;
     int status;
     int add_info;
-
+    uint64_t stk_hash;
+    uint64_t data_hash;
+    /////////////
     int right_block;
 };
 
 enum switch_if_ok
 {
+    WARP_VAL_DATA   =1024, 
     SK_KANARIKA_L   = 512,
     SK_KANARIKA_R   = 256,
     DATA_KANARIKA_L = 128,
@@ -51,4 +56,6 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* 
 switch_if_ok stack_assert(my_stack* stk);
 void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* file, int line));
 void user_dump(my_stack* stk);
+int compare_double(double a, double b);
+uint64_t get_data_hash(char* data, int size);
 #endif

@@ -4,6 +4,7 @@
         "hash_map": "cpp",
         "bitset": "cpp",
         "initializer_list": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "string": "cpp"
     }
 }

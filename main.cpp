@@ -13,6 +13,7 @@ int main(void)
     for (stack_elem_t j = 0; j < 21; j++)
     {
         MY_STACK_PUSH(&stk, j);
+        //printf("%llu\n", stk.data_hash);
         //user_dump(&stk);
     }
 

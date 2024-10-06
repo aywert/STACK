@@ -6,7 +6,6 @@ const int add_info = 2;
 
 switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, int line, const char* file, const char* function))
 {
-    //printf("%d", 0xDED);
     if (stk == NULL || !isnormal(size))
     {
         printf(RED("ERROR Pointer to stack is NULL or size IS NAN\n"));
@@ -21,26 +20,31 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, 
         my_stack_dump(stk ON_DEBUG(,function, file, line));
         return FAILURE;
     }
-    stk->left_block = 3565;
-    stk->right_block = 3565;
-    stk->data[0] = 0xDED;               //left_block
+    
+    stk->left_block     = 0xDED;
+    stk->right_block    = 0xDED;
+    stk->data[0]        = 0xDED; 
+    stk->data[size + 1] = 0xDED; 
+
     for (int i = 1; i <= size; i++)
     {
         stk->data[i] = poison_number;
     }       
-    stk->data[size + 1] = 0xDED;        //right_block
-    stk->data = &stk->data[1];
-    stk->name = name;
-    #ifdef DEBUG
-        stk->file = file;
-        stk->line = line;
-        stk->function = function;
-    #endif
-
+    
+    stk->data     = &stk->data[1];
+    stk->name     = name;
     stk->add_info = add_info;
     stk->capacity = size;
-    stk->size = 0;
-    stk->status = ALL_OK;
+    stk->size     = 0;
+    stk->status   = ALL_OK;
+    stk->stk_hash = 5381;
+    stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+
+    #ifdef DEBUG
+        stk->file     = file;
+        stk->line     = line;
+        stk->function = function;
+    #endif
 
     return SUCCESS;
 }
@@ -50,39 +54,37 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const ch
     if (stack_assert(stk) == FAILURE)
     {   
         my_stack_dump(stk ON_DEBUG(, function, file, line));
-        printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
         return FAILURE;
     }
+
     if (value == poison_number || (!(isnormal(value)) && (value != 0)))
     {
-        printf(RED("ERROR: Value is poison number or NAN\n"));
+        printf(RED("ERROR: Given value is poison number or NAN\n"));
         my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
     }
 
-    if (stk->size == stk->capacity)
-    {
-        stk->data[stk->capacity] = (stack_elem_t)poison_number;
-        if (get_memory(stk, 2) == SUCCESS)
-        {
-            stk->data = &stk->data[1];
-            stk->data[stk->capacity] = 0xDED;
-            stk->data[stk->size++] = value;
-            return SUCCESS;
-        }
-        else
-        {
-            stk->status += GET_MEMORY_FAIL;
-            my_stack_dump(stk ON_DEBUG(, function, file, line));
-            return FAILURE;
-        }
-    }
-    else
+    if(stk->size != stk->capacity)
     { 
         stk->data[stk->size++] = value;
+        stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
         return SUCCESS;
     }
-    
+
+    stk->data[stk->capacity] = (stack_elem_t)poison_number;
+    if (get_memory(stk, 2) == SUCCESS)
+    {
+        stk->data = &stk->data[1];
+        stk->data[stk->capacity] = 0xDED;
+        stk->data[stk->size++] = value;
+        stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+        return SUCCESS;
+    }
+
+    stk->status += GET_MEMORY_FAIL;
+    my_stack_dump(stk ON_DEBUG(, function, file, line));
+    return FAILURE;
+
 }
 
 switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* function, const char* file, int line))
@@ -100,37 +102,35 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* 
     }
     
     if (stk->size == 0)
+    {
+        stk->status += MY_UNDERFLOW;
+        my_stack_dump(stk ON_DEBUG(, function, file, line));
+        return FAILURE;
+    }
+
+    if (stk->size <= (int)stk->capacity/4 && stk->capacity > 10)
+    {
+        stk->data[stk->capacity] = 0xDED;
+        if (get_memory(stk, 0.5) == SUCCESS)
         {
-            stk->status += MY_UNDERFLOW;
+            stk->data = &stk->data[1];
+            stk->data[stk->capacity] = 0xDED;
+            *x = stk->data[--(stk->size)];
+            stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+            return SUCCESS;
+        }
+        else
+        {
+            stk->status += GET_MEMORY_FAIL;
             my_stack_dump(stk ON_DEBUG(, function, file, line));
             return FAILURE;
         }
-    else
-    {
-        if (stk->size <= (int)stk->capacity/4 && stk->capacity > 10)
-        {
-            stk->data[stk->capacity] = 0xDED;
-            if (get_memory(stk, 0.5) == SUCCESS)
-            {
-                stk->data = &stk->data[1];
-                stk->data[stk->capacity] = 0xDED;
-                *x = stk->data[--(stk->size)];
-                return SUCCESS;
-            }
-            else
-            {
-                stk->status += GET_MEMORY_FAIL;
-                my_stack_dump(stk ON_DEBUG(, function, file, line));
-                return FAILURE;
-            }
-        }
-        else
-        { 
-            *x = stk->data[--(stk->size)];
-            return SUCCESS;
-        }
     }
-    
+  
+    *x = stk->data[--(stk->size)];
+    stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+    return SUCCESS;
+
 }
 
 switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file, const char* function))
@@ -140,30 +140,39 @@ switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file,
         my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
     }
-    else // why?
-    {
-        stk->capacity = 0;
-        stk->size     = 0;
-        free(stk->data); stk->data = NULL;
-        
-        printf(GREEN("SUCCESSFULLY CLEARED\n"));
-        return SUCCESS;
-    }
+
+    stk->capacity = 0;
+    stk->size     = 0;
+    free(stk->data); stk->data = NULL;
+    
+    printf(GREEN("SUCCESSFULLY CLEARED\n"));
+    return SUCCESS;
 }
 
 /*
-void StackUp (stk)
+switch_if_ok make_stack_longer(my_stack* stk)
 {
-
-}
-
+    stk->capacity = (int)(stk->capacity * 2);
+    stack_elem_t* tempor_address = &stk->data[-1];
+    stk->data = (stack_elem_t*)realloc(tempor_address, (stk->capacity + stk->add_info) * sizeof(stack_elem_t));
+  
+    for (int i = (int)stk->capacity/2; i < stk->capacity; i++)
+        stk->data[i+1] = poison_number;
+    if (stk->data != NULL)
+    {
+        return SUCCESS;
+    }
+    else
+        return FAILURE;
+}*/
+/*
 void StackDown (stk)
 {
 
 }*/
 
 // const + bool sign
-switch_if_ok get_memory(my_stack* stk, double e)
+static switch_if_ok get_memory(my_stack* stk, double e)
 {
     stk->capacity = (int)(stk->capacity * e);
     stack_elem_t* tempor_address = &stk->data[-1];
