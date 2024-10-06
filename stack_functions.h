@@ -17,15 +17,16 @@ struct my_stack
     int left_block;
     //////////////
     const char* name;
-    const char* file;
-    const char* function;
-    int line;
-    /////////////
     stack_elem_t* data;
     int capacity;
     int size;
     int status;
     int add_info;
+    /////////////
+    const char* file;
+    const char* function;
+    int line;
+    //////////////
     uint64_t stk_hash;
     uint64_t data_hash;
     /////////////
@@ -34,6 +35,7 @@ struct my_stack
 
 enum switch_if_ok
 {
+    WARP_VAL_STK    =2048, 
     WARP_VAL_DATA   =1024, 
     SK_KANARIKA_L   = 512,
     SK_KANARIKA_R   = 256,
@@ -42,10 +44,10 @@ enum switch_if_ok
     MY_UNDERFLOW    =  32,
     GET_MEMORY_FAIL =  16,
     SIZE_NAN        =   8,
-    CAPACITY_NAN    =   4, // 1 << 3
-    DATA_NULL       =   2, // 1 << 2
-    ALL_OK          =   0, // 1 << 1
-    SUCCESS         =   1, // 1 << 0
+    CAPACITY_NAN    =   4,
+    DATA_NULL       =   2,
+    ALL_OK          =   0,
+    SUCCESS         =   1,
     FAILURE         =  -1,
 };
 
@@ -57,5 +59,5 @@ switch_if_ok stack_assert(my_stack* stk);
 void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* file, int line));
 void user_dump(my_stack* stk);
 int compare_double(double a, double b);
-uint64_t get_data_hash(char* data, int size);
+uint64_t get_hash(char* pointer, int size, int size_of_elem);
 #endif

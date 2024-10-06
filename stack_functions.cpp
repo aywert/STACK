@@ -20,6 +20,12 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, 
         my_stack_dump(stk ON_DEBUG(,function, file, line));
         return FAILURE;
     }
+
+    #ifdef DEBUG
+        stk->file     = file;
+        stk->line     = line;
+        stk->function = function;
+    #endif
     
     stk->left_block     = 0xDED;
     stk->right_block    = 0xDED;
@@ -37,14 +43,9 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, 
     stk->capacity = size;
     stk->size     = 0;
     stk->status   = ALL_OK;
-    stk->stk_hash = 5381;
-    stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
 
-    #ifdef DEBUG
-        stk->file     = file;
-        stk->line     = line;
-        stk->function = function;
-    #endif
+    stk->data_hash = get_hash((char*)(&stk->data[0]), stk->size, sizeof(stack_elem_t));
+    stk->stk_hash  = get_hash((char*)(&stk->name), 1, sizeof(my_stack)-28);
 
     return SUCCESS;
 }
@@ -53,6 +54,7 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const ch
 {
     if (stack_assert(stk) == FAILURE)
     {   
+        printf("i am here");
         my_stack_dump(stk ON_DEBUG(, function, file, line));
         return FAILURE;
     }
@@ -67,7 +69,8 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const ch
     if(stk->size != stk->capacity)
     { 
         stk->data[stk->size++] = value;
-        stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+        stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
+        stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);
         return SUCCESS;
     }
 
@@ -77,7 +80,8 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const ch
         stk->data = &stk->data[1];
         stk->data[stk->capacity] = 0xDED;
         stk->data[stk->size++] = value;
-        stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+        stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
+        stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);
         return SUCCESS;
     }
 
@@ -116,7 +120,8 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* 
             stk->data = &stk->data[1];
             stk->data[stk->capacity] = 0xDED;
             *x = stk->data[--(stk->size)];
-            stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+            stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
+            stk->stk_hash = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);
             return SUCCESS;
         }
         else
@@ -128,7 +133,8 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* 
     }
   
     *x = stk->data[--(stk->size)];
-    stk->data_hash = get_data_hash((char*)&stk->data[0], stk->size);
+    stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
+    stk->stk_hash = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);
     return SUCCESS;
 
 }
@@ -149,29 +155,6 @@ switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file,
     return SUCCESS;
 }
 
-/*
-switch_if_ok make_stack_longer(my_stack* stk)
-{
-    stk->capacity = (int)(stk->capacity * 2);
-    stack_elem_t* tempor_address = &stk->data[-1];
-    stk->data = (stack_elem_t*)realloc(tempor_address, (stk->capacity + stk->add_info) * sizeof(stack_elem_t));
-  
-    for (int i = (int)stk->capacity/2; i < stk->capacity; i++)
-        stk->data[i+1] = poison_number;
-    if (stk->data != NULL)
-    {
-        return SUCCESS;
-    }
-    else
-        return FAILURE;
-}*/
-/*
-void StackDown (stk)
-{
-
-}*/
-
-// const + bool sign
 static switch_if_ok get_memory(my_stack* stk, double e)
 {
     stk->capacity = (int)(stk->capacity * e);
