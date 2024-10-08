@@ -10,6 +10,8 @@
 #define MAGENTA(M) "\x1b[35m" M "\x1b[0m"
 #define CYAN(C)    "\x1b[36m" C "\x1b[0m"
 
+const double epsilon = 0.000001;
+
 #ifdef DEBUG
     #define ON_DEBUG(A, B, C, D) , B, C, D
 #else

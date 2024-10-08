@@ -159,7 +159,7 @@ void my_stack_dump(my_stack* stk ON_DEBUG(, const char* function, const char* fi
 
 int compare_double(double a, double b)
 {
-    if (fabs(a - b) <= 0.000001)
+    if (fabs(a - b) <= epsilon)
         return 1;
     else 
         return 0;

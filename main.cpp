@@ -13,12 +13,15 @@ int main(void)
     for (stack_elem_t j = 0; j < 21; j++)
     {
         MY_STACK_PUSH(&stk, j);
+        
     }
-    stk.status = 33;
+
+    
     for (stack_elem_t k = 0; k < 21; k++)
     {
         stack_elem_t x = 0;
         MY_STACK_POP(&stk, &x); 
+        //user_dump(&stk);
         printf("%lg\n", x);
     }
     stack_elem_t w = 0;

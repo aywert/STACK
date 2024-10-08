@@ -5,6 +5,7 @@
         "bitset": "cpp",
         "initializer_list": "cpp",
         "functional": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "vector": "cpp"
     }
 }
