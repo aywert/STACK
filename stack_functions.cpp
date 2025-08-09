@@ -8,12 +8,12 @@ const int add_info = 2;
 
 switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, int line, const char* file, const char* function))
 {
-    if (stk == NULL || !isnormal(size))
+    if (stk == NULL || !isnormal(size)) // float in memory
     {
         printf(RED("ERROR Pointer to stack is NULL or size IS NAN\n"));
         return FAILURE;
     }
-
+                                    // capacity
     stk->data = (stack_elem_t*)calloc(size + add_info, sizeof(stack_elem_t));
     
     if (stk->data == NULL)
@@ -42,12 +42,15 @@ switch_if_ok my_stack_ctor(my_stack* stk, int size, const char* name ON_DEBUG(, 
     stk->data     = &stk->data[1];
     stk->name     = name;
     stk->add_info = add_info;
-    stk->capacity = size;
+    stk->capacity = size; // capacity
     stk->size     = 0;
     stk->status   = ALL_OK;
 
     stk->data_hash = get_hash((char*)(&stk->data[0]), stk->size, sizeof(stack_elem_t));
-    stk->stk_hash  = get_hash((char*)(&stk->name), 1, sizeof(my_stack)-28);
+    stk->stk_hash  = get_hash((char*)(&stk->name), 1, sizeof(my_stack)-28); // const
+
+    // stk->stk_hash = 0;
+    // stk->stk_hash = get_hash ()...
 
     return SUCCESS;
 }
@@ -68,11 +71,11 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const ch
     }
 
     if(stk->size != stk->capacity)
-    { 
-        stk->data[stk->size++] = value;
-        stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
-        stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);
-        return SUCCESS;
+    { // copypaste// copypaste// copypaste
+        stk->data[stk->size++] = value; // copypaste// copypaste
+        stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));// copypaste// copypaste
+        stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);// copypaste
+        return SUCCESS;// copypaste// copypaste// copypaste
     }
 
     if (expand_stack(stk) == FAILURE)
@@ -82,11 +85,10 @@ switch_if_ok my_stack_push(my_stack* stk, stack_elem_t value ON_DEBUG(, const ch
         return FAILURE;
     }
 
-    stk->data[stk->size++] = value;
-    stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
-    stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack) - 28);
-
-    return SUCCESS;
+    stk->data[stk->size++] = value;// copypaste// copypaste
+    stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));// copypaste
+    stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack) - 28);// copypaste
+    return SUCCESS;// copypaste// copypaste// copypaste// copypaste// copypaste
 }
 
 switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* function, const char* file, int line))
@@ -110,28 +112,28 @@ switch_if_ok my_stack_pop(my_stack* stk, stack_elem_t* x ON_DEBUG(, const char* 
         return FAILURE;
     }
 
-    if (stk->size <= (int)stk->capacity/4 && stk->capacity > 10)
+    if (stk->size <= stk->capacity/4 && stk->capacity > 10) // const
     {
-        if (shrink_stack(stk) == FAILURE)
+        if (shrink_stack(stk) == FAILURE) // 
         {
             stk->status += GET_MEMORY_FAIL;
             my_stack_dump(stk ON_DEBUG(, function, file, line));
             return FAILURE;
         }
     
-        *x = stk->data[--(stk->size)];
-        stk->data[stk->size+1] = poison_number;
-        stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
-        stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);
-
+        *x = stk->data[--(stk->size)];// copypaste// copypaste// copypaste
+        stk->data[stk->size+1] = poison_number;// copypaste
+        stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));// copypaste// copypaste
+        stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);// copypaste
+// copypaste// copypaste
         return SUCCESS;
     }
   
-    *x = stk->data[--(stk->size)];
-    stk->data[stk->size+1] = poison_number;
+    *x = stk->data[--(stk->size)];// copypaste// copypaste// copypaste
+    stk->data[stk->size+1] = poison_number;// copypaste// copypaste// copypaste
     stk->data_hash = get_hash((char*)&stk->data[0], stk->size, sizeof(stack_elem_t));
-    stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);
-    return SUCCESS;
+    stk->stk_hash  = get_hash((char*)&stk->name, 1, sizeof(my_stack)-28);// copypaste// copypaste// copypaste
+    return SUCCESS;// copypaste// copypaste// copypaste// copypaste
 
 }
 
@@ -143,8 +145,8 @@ switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file,
         return FAILURE;
     }
 
-    stk->capacity = 0;
-    stk->size     = 0;
+    stk->capacity = -1;
+    stk->size     = -1;
     free(stk->data); stk->data = NULL;
     
     printf(GREEN("SUCCESSFULLY CLEARED\n"));
@@ -153,7 +155,7 @@ switch_if_ok my_stack_dtor(my_stack* stk ON_DEBUG (, int line, const char* file,
 
 static switch_if_ok expand_stack(my_stack* stk)
 {
-    
+    // assert
     stk->capacity = stk->capacity * 2;
     stack_elem_t* tempor_address = &stk->data[-1];
     stk->data = (stack_elem_t*)realloc(tempor_address, (stk->capacity + stk->add_info) * sizeof(stack_elem_t));
@@ -161,8 +163,8 @@ static switch_if_ok expand_stack(my_stack* stk)
     if (stk->data == NULL)
         return FAILURE;
     
-    for (int i = stk->capacity/2; i < stk->capacity; i++)
-        stk->data[i+1] = poison_number;
+    for (int i = stk->capacity/2 + 1; i <= stk->capacity; i++)
+        stk->data[i] = poison_number;
 
     stk->data[stk->capacity + 1] = 0xDED;
     stk->data = &stk->data[1];    
@@ -172,7 +174,7 @@ static switch_if_ok expand_stack(my_stack* stk)
 
 static switch_if_ok shrink_stack(my_stack* stk)
 {
-    
+    // assert
     stk->capacity = stk->capacity/2;
     stack_elem_t* tempor_address = &stk->data[-1];
     stk->data = (stack_elem_t*)realloc(tempor_address, (stk->capacity + stk->add_info) * sizeof(stack_elem_t));
